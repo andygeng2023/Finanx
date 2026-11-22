@@ -22,7 +22,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p dist
-          cp index.html dist/index.html
+          cp ./*.html dist/
           printf '%s\\n' 'finanx.is-a-fullstack.dev' > dist/CNAME
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
