@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080d18"><title>Account · Finanx</title>
+<style>
+:root{color-scheme:dark;--bg:#080d18;--panel:#111d30;--muted:#9eacc1;--text:#f4f7fc;--line:#293b54;--blue:#91b4ff;--mint:#82e4c1}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 75% 5%,#1b3558,transparent 38%),var(--bg);color:var(--text);font:16px/1.6 Inter,system-ui,sans-serif}.card{width:min(440px,100%);padding:30px;border:1px solid var(--line);border-radius:20px;background:#111d30eF;box-shadow:0 25px 80px #0007}.brand{display:block;margin-bottom:30px;color:var(--text);font-size:23px;font-weight:800;text-decoration:none;letter-spacing:-1px}.brand b{color:var(--mint)}.eyebrow{color:var(--mint);font-size:11px;font-weight:800;letter-spacing:1.7px}h1{margin:9px 0;font-size:32px;letter-spacing:-1px}p{color:var(--muted)}.switch{display:flex;gap:8px;margin:22px 0}.switch button,form button{border:1px solid var(--line);border-radius:10px;padding:11px 15px;background:#192a42;color:var(--text);font:inherit;font-weight:700;cursor:pointer}.switch button[aria-pressed=true],form button{background:linear-gradient(135deg,#a9c5ff,#7099f1);color:#081326;border-color:transparent}.switch button{flex:1}label{display:block;margin:15px 0;color:#c6d1e1;font-size:13px}input{display:block;width:100%;margin-top:7px;padding:13px;border:1px solid #344967;border-radius:9px;background:#091321;color:var(--text);font:inherit}form button{width:100%;margin-top:12px}#feedback{min-height:45px;font-size:13px}a.back{color:var(--blue);font-size:13px;text-decoration:none}button:disabled{opacity:.6;cursor:wait}
+</style></head><body><main class="card"><a class="brand" href="index.html">finan<b>x</b></a><div class="eyebrow">YOUR FINANX ACCOUNT</div><h1 id="heading">Sign in</h1><p id="description">Sign in to keep your watchlist synced across devices.</p>
+<div class="switch"><button id="signin-tab" type="button">Sign in</button><button id="signup-tab" type="button">Create account</button></div>
+<form id="account-form"><label>Email address<input id="email" type="email" required autocomplete="email" maxlength="254" placeholder="you@example.com"></label><label>Password<input id="password" type="password" required minlength="8" autocomplete="current-password" placeholder="At least 8 characters"></label><button id="submit" type="submit">Sign in</button></form><p id="feedback" role="status" aria-live="polite"></p><a class="back" href="index.html">← Back to Finanx</a></main>
+<script>
+(() => {
+ const API="https://nlaookgsiqojxejwvdsn.supabase.co/functions/v1/stock-analyser-api";
+ const KEY="sb_publishable_-Ty9nayZpJSDo9YwKVzEdw_dG5bD6Kz";
+ const APP="https://site.finanx.is-a-fullstack.dev/";
+ let mode=new URLSearchParams(location.search).get("mode")==="signup"?"signup":"signin";
+ const $=id=>document.getElementById(id);
+ function setMode(next){mode=next;$("heading").textContent=mode==="signup"?"Create your account":"Sign in";$("description").textContent=mode==="signup"?"Create an account to sync your watchlist across devices.":"Sign in to access your saved watchlist."; $("submit").textContent=mode==="signup"?"Create account":"Sign in";$("password").autocomplete=mode==="signup"?"new-password":"current-password";$("signin-tab").setAttribute("aria-pressed",String(mode==="signin"));$("signup-tab").setAttribute("aria-pressed",String(mode==="signup"));$("feedback").textContent="";}
+ $("signin-tab").addEventListener("click",()=>setMode("signin"));$("signup-tab").addEventListener("click",()=>setMode("signup"));
+ $("account-form").addEventListener("submit",async event=>{event.preventDefault();const button=$("submit");button.disabled=true;$("feedback").textContent=mode==="signup"?"Creating your account…":"Signing in…";
+  try{const response=await fetch(API+"/api/auth/"+(mode==="signup"?"signup":"login"),{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY},body:JSON.stringify({email:$("email").value.trim(),password:$("password").value})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||"Authentication failed.");
+   if(data.session){location.replace(APP+"#finanx_session="+encodeURIComponent(JSON.stringify(data.session)));return;}
+   if(mode==="signup"){$("feedback").textContent="Account created. Check your email for a confirmation link, then return here to sign in.";}else{throw new Error("The sign-in response did not include a session. Please try again.");}
+  }catch(error){$("feedback").textContent=error.message||"Please try again.";}finally{button.disabled=false;}
+ });
+ setMode(mode);
+})();
+</script></body></html>
