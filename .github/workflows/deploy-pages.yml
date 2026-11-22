@@ -23,7 +23,12 @@ jobs:
         run: |
           mkdir -p dist
           cp ./*.html dist/
+          test -s dist/index.html
+          test -s dist/account.html
+          grep -q 'account.html?mode=signin' dist/index.html
+          grep -q 'account.html?mode=signup' dist/index.html
           printf '%s\\n' 'finanx.is-a-fullstack.dev' > dist/CNAME
+          test "$(cat dist/CNAME)" = "finanx.is-a-fullstack.dev"
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
